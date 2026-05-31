@@ -1,0 +1,30 @@
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=wb_shop
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_secure_pass
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DB_HOST=db
+      - DB_NAME=wb_shop
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres_secure_pass
+      - SECRET_KEY=your_django_secret_key
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
