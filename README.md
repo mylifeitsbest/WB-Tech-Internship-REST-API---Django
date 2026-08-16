@@ -1,100 +1,58 @@
-# 🛍️ WB Tech Internship: REST API интернет-магазина на Django
+<div align="center">
 
-Тестовое задание для стажёра на позицию Backend-разработчика. Проект представляет собой REST API сервис интернет-магазина с JWT-авторизацией, управлением корзиной, складом и транзакционной системой заказов.
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=26&pause=1000&color=F8D800&center=true&vCenter=true&width=700&lines=%F0%9F%9B%8D%EF%B8%8F+MARKETFLOW+E-COMMERCE+API;%E2%9A%A1+DJANGO+REST+FRAMEWORK+%2B+POSTGRESQL;%F0%9F%94%92+CONCURRENT+ORDER+PROCESSING" alt="Typing SVG" />
 
----
+  <p align="center">
+    <b>Масштабируемый REST API сервис интернет-магазина с изолированным слоем сервисов, JWT-авторизацией и транзакционным контролем склада</b>
+  </p>
 
-## 🛠️ Стек технологий и архитектура
+  <p align="center">
+    <img src="https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python" />
+    <img src="https://img.shields.io/badge/Django-4+-092E20?style=flat-square&logo=django&logoColor=white" alt="Django" />
+    <img src="https://img.shields.io/badge/DRF-REST_Framework-red?style=flat-square&logo=django&logoColor=white" alt="DRF" />
+    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+    <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker" />
+    <img src="https://img.shields.io/badge/Swagger-OpenAPI_3.0-85EA2D?style=flat-square&logo=swagger&logoColor=black" alt="Swagger" />
+  </p>
 
-*   **Язык**: Python 3.11+
-*   **Фреймворк**: Django 4+ / Django REST Framework (DRF)
-*   **База данных**: PostgreSQL (Django ORM)
-*   **Авторизация**: JWT (JSON Web Token via simplejwt)
-*   **Документация**: Автогенерация OpenAPI/Swagger (drf-spectacular)
-*   **Контейнеризация**: Docker / Docker Compose
-*   **Тестирование**: Django Tests (unittest)
-
-### Архитектурные особенности:
-*   **Декомпозиция (Services Layer)**: Вся бизнес-логика вынесена из контроллеров (`views.py`) в изолированный слой сервисов (`services.py`).
-*   **Атомарность и Race Conditions**: Создание заказа защищено декоратором `@transaction.atomic` и блокировкой строк базы данных `select_for_update()`. Это предотвращает сбои при одновременной покупке товара несколькими пользователями.
-*   **Централизованный роутинг**: Все эндпоинты системы собраны и подключены в едином главном модуле конфигурации для упрощения поддержки кода.
-*   **Система логирования**: Оформлено потоковое логирование успешных транзакций в консоль приложения и физический файл `orders.log`.
+</div>
 
 ---
 
-## 🚀 Быстрый запуск в Docker
+### 📌 О проекте
 
-Проект полностью настроен для развертывания одной командой.
-
-### 1. Подготовка окружения
-Создайте в корневой директории файл `.env` и заполните его переменными:
-```env
-SECRET_KEY=super_secret_django_key_12345
-DEBUG=True
-ALLOWED_HOSTS=*
-
-DB_NAME=wb_shop
-DB_USER=postgres
-DB_PASSWORD=postgres_secure_pass
-DB_HOST=db
-DB_PORT=5432
-```
-
-### 2. Сборка и запуск контейнеров
-Запустите сборку окружения. База данных автоматически применит миграции и поднимет веб-сервер:
-```bash
-docker compose up --build
-```
-После успешного запуска API будет доступно по адресу: `http://localhost:8000/api/`.
+**MarketFlow** — полнофункциональный e-commerce бэкенд-сервис, спроектированный с учетом требований к надежности финансовых операций и параллельной обработке заказов. Сервис решает ключевые задачи онлайн-ритейла: управление каталогом, корзинами, балансом пользователей и атомарным резервированием товарных остатков при высоких нагрузках.
 
 ---
 
-## 📄 Документация API (Swagger / OpenAPI)
+### 🛡️ Архитектурные паттерны & Особенности
 
-В проект интегрирован интерактивный интерфейс Swagger, позволяющий тестировать эндпоинты прямо из браузера.
-
-*   **Интерфейс Swagger UI**: `http://localhost:8000/api/docs/`
-*   **Спецификация OpenAPI (JSON schema)**: `http://localhost:8000/api/schema/`
-
-### Основные эндпоинты:
-*   `POST /api/users/register/` — Регистрация нового аккаунта.
-*   `POST /api/token/` — Получение JWT-токена (Авторизация).
-*   `GET /api/users/profile/` — Просмотр профиля и баланса.
-*   `POST /api/users/balance/topup/` — Пополнение личного баланса.
-*   `GET /api/products/` — Просмотр списка товаров (доступно всем).
-*   `POST /api/products/` — Создание товара (Только для Admin/Staff).
-*   `GET /api/cart/` — Просмотр текущей корзины.
-*   `POST /api/cart/` — Добавить товар в корзину.
-*   `POST /api/orders/create/` — Создание заказа из корзины (списание денег и склада).
+* 🧱 **Изоляция бизнес-логики (Services Layer):** контроллеры (`views.py`) остаются тонкими — все транзакции и операции проводятся через выделенный слой `services.py`.
+* 🔒 **Гарантия ACID и защита от Race Conditions:** оформление покупок выполняется строго внутри `@transaction.atomic` с пессимистической блокировкой строк инвентаря через `select_for_update()`. Исключает овербукинг и покупку товаров «в минус».
+* 🔑 **Безопасность и сессии:** JWT-авторизация (Access / Refresh токены) на базе `simplejwt` с разграничением прав доступа (RBAC).
+* 📜 **Аудит и логирование:** запись всех ключевых событий и финансовых транзакций в консоль и физический файл `orders.log`.
+* 📖 **OpenAPI 3.0 Спецификация:** автогенерация документации и песочницы Swagger UI с помощью `drf-spectacular`.
 
 ---
 
-## 🧪 Запуск автоматических тестов
+### 🔄 Механика безопасного заказа (Transactional Flow)
 
-Покрытие кода тестами включает проверку транзакционной логики, валидацию остатков на складе и валидацию баланса пользователя при покупке.
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client as Клиент (Mobile/Web)
+    participant API as Orders API (DRF)
+    participant Service as OrderService (services.py)
+    participant DB as PostgreSQL (ACID)
 
-Для запуска тестов внутри поднятого Docker-контейнера выполните:
-```bash
-docker compose exec web python manage.py test
-```
-
----
-
-## 📂 Иерархия исходного кода
-
-```text
-├── config/                  # Глобальные настройки Django и общий роутинг
-│   ├── settings.py          # Конфигурация БД, JWT, Логов, Шаблонов
-│   ├── urls.py              # Главный файл путей со всеми эндпоинтами магазина
-│   ├── wsgi.py              # Точка входа для WSGI-серверов
-│   └── asgi.py              # Точка входа для асинхронных ASGI-серверов
-├── apps/                    # Изолированные бизнес-модули
-│   ├── users/               # Модель User, баланс, регистрация, профиль
-│   ├── products/            # Каталог товаров, управление складом, админка
-│   └── orders/              # Корзина, заказы и слой бизнес-сервисов
-├── tests/                   # Интеграционные тесты системы
-├── manage.py                # Главный скрипт управления и запуска Django
-├── Dockerfile               # Инструкции сборки Python-окружения
-├── docker-compose.yml       # Сценарий развертывания веб-сервиса и PostgreSQL
-└── .env                     # Конфигурационные файлы среды (секреты)
-```
+    Client->>API: POST /api/orders/create/
+    API->>Service: create_order(user, cart)
+    critical Транзакционный блок (@transaction.atomic)
+        Service->>DB: select_for_update() (Блокировка остатков на складе)
+        Service->>DB: Валидация баланса кошелька и остатков
+        Service->>DB: Списание баланса + Уменьшение остатка склада
+        Service->>DB: Создание записи Order & OrderItems
+        Service->>DB: Очистка корзины (Cart.clear())
+    end
+    Service-->>API: Объект созданного заказа
+    API-->>Client: 201 Created (Детали заказа)
